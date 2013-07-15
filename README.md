@@ -17,16 +17,16 @@ integration with CodeIgniter
 
 You are suggested to place the four PHP files in application/libraries:
 
-# ./Batarang.php
-# ./BatarangConfig.php
-# ./BatarangDB.php
-# ./BatarangMasks.php
+1. ./Batarang.php
+2. ./BatarangConfig.php
+3. ./BatarangDB.php
+4. ./BatarangMasks.php
 
 The three client content directories should go in your web root:
 
-# ./css/
-# ./img/
-# ./js/
+1. ./css/
+2. ./img/
+3. ./js/
 
 Then, add Batarang.php to your CodeIgniter autoload section. **Do not autoload
 the other script files.**
@@ -55,7 +55,7 @@ implementation
 		
 Of course, this is a complicated example. At its simplest, all you need is:
 
-   $Output = $this->batarang->TableFromDBResults($Data);
+    $Output = $this->batarang->TableFromDBResults($Data);
 		
 Batarang will do some clever stuff and display your data array attractively. Everything else is optional.
 	
