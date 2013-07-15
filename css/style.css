@@ -1,0 +1,283 @@
+/*------------------------------------*\
+	RESET
+\*------------------------------------*/
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{
+	margin:0;
+	padding:0;
+}
+table{
+	border-collapse:collapse;
+	border-spacing:0;
+}
+fieldset,img{
+	border:0;
+}
+address,caption,cite,code,dfn,th,var{
+	font-style:normal;
+	font-weight:normal;
+}
+caption,th{
+	text-align:left;
+}
+h1,h2,h3,h4,h5,h6{
+	font-size:100%;
+	font-weight:normal;
+}
+q:before,q:after{
+	content:'';
+}
+abbr,acronym{
+	border:0;
+}
+
+/*------------------------------------*\
+	NAV
+\*------------------------------------*/
+#MainMenu {
+	list-style:none;
+	font-weight:bold;
+	margin-bottom:10px;
+	/* Clear floats */
+	float:left;
+	width:100%;
+	/* Bring the nav above everything else--uncomment if needed.
+	position:relative;
+	z-index:5;
+	*/
+}
+#MainMenu li{
+	float:left;
+	margin-right:10px;
+	position:relative;
+}
+#MainMenu a{
+	display:block;
+	padding:5px;
+	color:#fff;
+	background:#333;
+	text-decoration:none;
+}
+#MainMenu a:hover{
+	color:#fff;
+	background:#6b0c36;
+	text-decoration:underline;
+}
+
+/*--- DROPDOWN ---*/
+#MainMenu ul{
+	background:#fff; /* Adding a background makes the dropdown work properly in IE7+. Make this as close to your page's background as possible (i.e. white page == white background). */
+	background:rgba(255,255,255,0); /* But! Let's make the background fully transparent where we can, we don't actually want to see it if we can help it... */
+	list-style:none;
+	position:absolute;
+	left:-9999px; /* Hide off-screen when not needed (this is more accessible than display:none;) */
+}
+#MainMenu ul li{
+	padding-top:1px; /* Introducing a padding between the li and the a give the illusion spaced items */
+	float:none;
+}
+#MainMenu ul a{
+	white-space:nowrap; /* Stop text wrapping and creating multi-line dropdown items */
+}
+#MainMenu li:hover ul{ /* Display the dropdown on hover */
+	left:0; /* Bring back on-screen when needed */
+}
+#MainMenu li:hover a{ /* These create persistent hover states, meaning the top-most link stays 'hovered' even when your cursor has moved down the list. */
+	background:#6b0c36;
+	text-decoration:underline;
+}
+#MainMenu li:hover ul a{ /* The persistent hover state does however create a global style for links even before they're hovered. Here we undo these effects. */
+	text-decoration:none;
+}
+#MainMenu li:hover ul li a:hover{ /* Here we define the most explicit hover states--what happens when you hover each individual link. */
+	background:#333;
+}
+
+/*------------------------------------*\
+	Batarang table Styles
+\*------------------------------------*/
+
+
+::selection{ background-color: #E13300; color: white; }
+	::moz-selection{ background-color: #E13300; color: white; }
+	::webkit-selection{ background-color: #E13300; color: white; }
+
+	body {
+		background-color: #fff;
+		margin: 40px;
+		font: 13px/20px normal Helvetica, Arial, sans-serif;
+		color: #4F5155;
+	}
+
+	a {
+		color: #003399;
+		background-color: transparent;
+		font-weight: normal;
+	}
+	
+	#menu {
+		border-bottom: 1px solid #D0D0D0;
+		background-color: #f7fafb;
+		font-size: 16px;
+		font-weight: normal;
+		margin: 0 0 0px 0;
+		padding: 10px 15px 10px 15px;
+		height: 32px;
+	}
+	
+	#pageheader {
+		margin-bottom: 0px;
+	}
+
+	h1, h2, h3 {
+		color: #444;
+		background-color: transparent;
+		border-bottom: 1px solid #D0D0D0;
+		font-size: 19px;
+		font-weight: normal;
+		margin: 0 0 14px 0;
+		padding: 14px 15px 10px 15px;
+	}
+	
+	h2 {
+		font-size: 15px;
+		padding: 9px 0px 9px 0px;
+	}
+	
+	h3 {
+	
+	}
+	
+
+	code {
+		font-family: Consolas, Monaco, Courier New, Courier, monospace;
+		font-size: 12px;
+		background-color: #f9f9f9;
+		border: 1px solid #D0D0D0;
+		color: #002166;
+		display: block;
+		margin: 14px 0 14px 0;
+		padding: 12px 10px 12px 10px;
+	}
+
+	#body{
+		margin: 0 15px 0 15px;
+	}
+	
+	p.footer{
+		text-align: right;
+		font-size: 11px;
+		border-top: 1px solid #D0D0D0;
+		line-height: 32px;
+		padding: 0 10px 0 10px;
+		margin: 20px 0 0 0;
+	}
+	
+	#container{
+		border: 1px solid #D0D0D0;
+		display: inline-block;
+		margin: 0 auto;
+		min-width: 1024px;
+	}
+	
+	.warning {
+		color: red;
+		font-weight: 700;
+		border: 2px dashed pink;
+		padding: 12px 10px 12px 10px;
+		margin: 14px 0 14px 0;
+	}
+	
+	.LoginBox label {
+		width: 70px;
+		display: inline-block;
+	}
+	
+	.LoginBox input {
+		
+	}
+	
+	.LoginBox button {
+		width: 25px;
+	}
+	
+/*------------------------------------*\
+	Batarang Styles
+\*------------------------------------*/
+	
+	Table.BatarangLookup {
+		border: 1px solid #D0D0D0;
+	}
+	
+	Table.BatarangLookup th, Table.BatarangLookup td {
+		padding: 3px 10px;
+	}
+	
+	Table.BatarangLookup tr.BatarangAction.Divide {
+		border-top: 1px solid #D0D0D0;
+	}
+	
+	Table.BatarangLookup input.BatarangAction.BatarangControls {
+		float: right;
+	}
+	
+	Table.BatarangLookup .disabled {
+	  /* IE 8 */
+	  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	  /* IE 5-7 */
+	  filter: alpha(opacity=50);
+	  /* Netscape */
+	  -moz-opacity: 0.5;
+	  /* Safari 1.x */
+	  -khtml-opacity: 0.5;
+	  /* Good browsers */
+	  opacity: 0.5;
+	  font-style: oblique;
+	  background-color: lightgray;
+	}
+	
+	.BatarangHeaders th {
+		border-bottom: 1px solid #D0D0D0;
+	}
+	
+	.BatarangHeaders th:nth-child(even), .BatarangAction th:nth-child(even) {
+		background-color: #f7fafb;
+	}
+	
+	.BatarangRecord td:nth-child(even), .BatarangAction td:nth-child(even) {
+		background-color: #EEF3F6;
+	}
+	
+	.BatarangRecord:hover {
+		background-color: #e7edf1;
+	}
+	
+	.BatarangRecord:hover  td:nth-child(even) {
+		background-color: #dfe7ed;
+	}
+	
+	.BatarangForm {
+		height: 40px;
+		margin-bottom: 5px
+	}
+	
+	.BatarangForm_Button:hover {
+		opacity: 1;
+	}
+	
+	.BatarangForm_Button {
+		float: left;
+		background-color: transparent;
+		background-image: url("/img/icons/pen.png");
+		border: 0 none;
+		margin-left: 2px;
+		margin-right: 2px;
+		bottom: -3px;
+		position: relative;
+		height: 16px;
+		width: 16px;
+		opacity: 0.6;
+	}
+	
+	.BatarangForm_Button_Delete {
+		background-image: url("/img/icons/x.png");
+	}
