@@ -58,11 +58,11 @@ class BatarangMasks {
 		$Path = dirname(__FILE__).'/masks/';
 		$MaskFiles = glob($Path."*.php");
 		foreach($MaskFiles as $MaskFile) {
+			$MaskFile = basename($MaskFile);
 			include($Path.$MaskFile);
-			$MaskName = substr(0, strlen($MaskFile)-4);
+			$MaskName = substr($MaskFile, 0, strlen($MaskFile)-4);
 			$Masks[$MaskName] = $Mask;
 		}
-		
 		if ($FindMask && is_array($Masks[$FindMask])){
 			return $Masks[$FindMask];
 		} else if ($FindMask){

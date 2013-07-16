@@ -37,9 +37,27 @@ class Batarang {
 	return $Out;
 	}
 
+	public function FromTable($Table, $Action = false, $Writable = false, $RecordsPerPage = 40)
+	{
+		$s_Table = $this->BatarangDB->escape_string($Table);
+		$Query = "SELECT * FROM $s_Table;";
+		$Out =  $this->FromQuery($Query, $Action = false, $Writable = false, $RecordsPerPage = 40);
+		
+		return $Out;
+	}
+
+	public function FromQuery($Query, $Action = false, $Writable = false, $RecordsPerPage = 40)
+	{
+		$R = $this->BatarangDB->ArrayQuery($Query);
+		$Out = $this->FromArray($R, $Action, $Writable, $RecordsPerPage);
+		
+		return $Out;
+	
+	}
+
 	// This takes a query result in the form of an associative array, and renders it
 	// to a grid. 
-	public function TableFromDBResults($Results, $Action = false, $Writable = false, $RecordsPerPage = 40)
+	public function FromArray($Results, $Action = false, $Writable = false, $RecordsPerPage = 40)
 	{
 		if (is_null($Results)){
 				$Results[0] = array(

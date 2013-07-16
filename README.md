@@ -11,6 +11,9 @@ Batarang plays well with existing software, and uses your existing database
 connection. If you're building without a framework, setting your connection
 up in BatarangDB.php is a reasonable choice.
 
+To install, simply include Batarang.php at the beginning of your application and edit
+BatarangConfig.php so that it knows what database to use. You're ready to go!
+
 
 Integration with CodeIgniter
 ----------------------------
@@ -59,11 +62,11 @@ Implementation
 			'Mask'		=> 'DataLookupGrid'														// A mask we've defined to give our database column names nicer
 		);
 		
-		$Output = $this->batarang->TableFromDBResults($Data,	$Action); 						// Generate our HTML and save it to a variable!
+		$Output = $this->batarang->FromArray($Data,	$Action); 						// Generate our HTML and save it to a variable!
 		
 Of course, this is a complicated example. At its simplest, all you need is:
 
-    $Output = $this->batarang->TableFromDBResults($Data);
+    $Output = $this->batarang->FromArray($Data);
 		
 Batarang will do some clever stuff and display your data array attractively. Everything else is optional.
 
@@ -88,9 +91,12 @@ need to worry about how it'd displayed to the user.
 To create a mask, create a file in ./masks/ named after your mask, with the .php extension. For
 instance, to create a mask called FooBar, your file should be "./masks/FooBar.php".
 
-The contents are simply a PHP array of key => name pairs, in a string called $Mask:
+The contents are simply a PHP array of key => name pairs, in a string called $Mask. The opening <?
+is essential!
 
-    $Mask = array(
+Example:
+
+    <? $Mask = array(
     	'FOOBAR'			=>	'Foo Bar',
     	'MEMO'				=>	'Notes'
     );
@@ -117,6 +123,7 @@ There are a number of features we'd like which aren't done yet. That list includ
 * Fully automatic conf for basic table update/delete code via RDBMS __describe__
 * Related $Batarang->TableFromQuery() method would be nice :)
 * Database-backed Mask storage
+* Autodetect existing DB connection and switch DB functions to match rather than relying on BatarangConfig value
 * Pre-insert/pre-update function callbacks for field data
 * Pre-query data consistency & typing validation
 * Get some coffee that isn't stale

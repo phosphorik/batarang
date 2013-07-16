@@ -3,6 +3,6 @@
 class BatarangConfig {
     var $DBDriver;
     function __construct(){
-        $this->DBDriver = 'MSSQL'; //Legal values are PostgreSQL, MSSQL
+        $this->DBDriver = 'PostgreSQL'; //Legal values are PostgreSQL, MSSQL
     }
 }

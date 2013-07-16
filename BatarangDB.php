@@ -138,7 +138,7 @@ class BatarangDB {
             case 'MSSQL': // In this case the MS-SQL query should be identical to the PostgreSQL query
             case 'PostgreSQL':
                 if (strtolower($Type) == 'add'){
-                        foreach($Action['Tables'] as $Column => $FieldProps){
+                        foreach($Action['Table'] as $Column => $FieldProps){
                                 $FieldsToInsert = Array();
                                 $ActionQuery = "INSERT INTO \n";
                                 $Keys = array_keys($FieldProps);
