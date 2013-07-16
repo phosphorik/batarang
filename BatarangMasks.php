@@ -53,16 +53,19 @@ class BatarangMasks {
 		
 	}
 	
-	private function Masks($Mask = false)
+	private function Masks($FindMask = false)
 	{
-		$Masks['ExampleMask'] = array(
-			'CLIENT_ID'			=>	'Client ID',
-			'MEMO'				=>	'Notes'
-		);
+		$Path = dirname(__FILE__).'/masks/';
+		$MaskFiles = glob($Path."*.php");
+		foreach($MaskFiles as $MaskFile) {
+			include($Path.$MaskFile);
+			$MaskName = substr(0, strlen($MaskFile)-4);
+			$Masks[$MaskName] = $Mask;
+		}
 		
-		if ($Mask && is_array($Masks[$Mask])){
-			return $Masks[$Mask];
-		} else if ($Mask){
+		if ($FindMask && is_array($Masks[$FindMask])){
+			return $Masks[$FindMask];
+		} else if ($FindMask){
 			return false;
 		} else {
 			return $Masks;

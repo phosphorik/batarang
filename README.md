@@ -15,12 +15,13 @@ up in BatarangDB.php is a reasonable choice.
 Integration with CodeIgniter
 ----------------------------
 
-You are suggested to place the four PHP files in application/libraries:
+You are suggested to place the four PHP files and the masks directory in application/libraries:
 
 1. ./Batarang.php
 2. ./BatarangConfig.php
 3. ./BatarangDB.php
 4. ./BatarangMasks.php
+5. ./masks/
 
 The three client content directories should go in your web root:
 
@@ -30,6 +31,13 @@ The three client content directories should go in your web root:
 
 Then, add Batarang.php to your CodeIgniter autoload section. **Do not autoload
 the other script files.**
+
+
+Integration with some other framework
+-------------------------------------
+
+Let us know how it works out for you. Batarang is self-contained enough that it should
+be pretty simple.
 
 
 Implementation
@@ -60,6 +68,37 @@ Of course, this is a complicated example. At its simplest, all you need is:
 Batarang will do some clever stuff and display your data array attractively. Everything else is optional.
 
 
+Masks
+-----
+
+A mask is just an array that is used to programmatically replace ugly field names with
+attractive ones. This has benefits over using AS for beautification in your queries; consider:
+
+    SELECT first_name AS "First name", last_name AS "Last name";
+    
+Though this will result in an attractive table, it will be less consistent, because
+* Performing logic on the array post-transformation will need to address each key by the new keyname
+* There is no systematic means for mapping each key to the same beautified keyname each time
+* Processing the data later means reversing the transformation, or explicitly saving the original array
+
+Batarang abstracts these problems away by only performing the substitution during the rendering
+phase. Masked data is never saved or exposed to your application's internals, so you don't
+need to worry about how it'd displayed to the user.
+
+To create a mask, create a file in ./masks/ named after your mask, with the .php extension. For
+instance, to create a mask called FooBar, your file should be "./masks/FooBar.php".
+
+The contents are simply a PHP array of key => name pairs, in a string called $Mask:
+
+    $Mask = array(
+    	'FOOBAR'			=>	'Foo Bar',
+    	'MEMO'				=>	'Notes'
+    );
+
+You can apply a mask to a Batarang lookup by specifying its name in the Mask field of the
+invocation. You can also apply the mask to an array using the $BatarangMasks->ApplyToArray($array)
+method.
+
 Database stuff
 --------------
 
@@ -75,8 +114,9 @@ Todo
 There are a number of features we'd like which aren't done yet. That list includes
 (but is not necessarily limited to) the following:
 
-* Better mask definition workflow
 * Fully automatic conf for basic table update/delete code via RDBMS __describe__
 * Related $Batarang->TableFromQuery() method would be nice :)
+* Database-backed Mask storage
+* Pre-insert/pre-update function callbacks for field data
 * Pre-query data consistency & typing validation
 * Get some coffee that isn't stale
