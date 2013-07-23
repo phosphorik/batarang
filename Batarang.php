@@ -9,6 +9,7 @@ require('BatarangMasks.php');
 	 */
 
 class Batarang {
+
 	public $BatarangConfig;
 	public $BatarangDB;
 	public $BatarangMasks;
@@ -21,7 +22,8 @@ class Batarang {
 		$this->BatarangMasks = new BatarangMasks();
 		$this->__BuiltInActions = array('edit', 'delete');
 	}
-	public function TableHeadersFromDBResults($Results, $Mask = false)
+	
+	public function TableHeadersFromDBResults($Results, $Mask = false, $KeyHandling = KeyHandling::Copy)
 	{
 	$Headers = array_keys($Results[0]);
 
@@ -29,6 +31,8 @@ class Batarang {
 			
 			foreach ($Headers as $Label){
 				if (is_array($Mask)){
+					$Mask[$Label] = $this->BatarangMasks->MaskField($Label, $Mask, $KeyHandling);
+					if ($Mask[$Label] === false || $Mask[$Label] == KeyFlags::Hide) { continue; }
 					$Label = $Mask[$Label];
 				}
 				$Out .= "<th>{$Label}</th>";
@@ -103,6 +107,7 @@ class Batarang {
 			
 			$ActionQuery = $this->BatarangDB->BuildActionQuery($Action);
 			$UIFields			= $ActionQuery['UIFields'];
+			$DBFields			= $ActionQuery['DBFields'];
 			$UIFieldsProperties	= $ActionQuery['UIFieldsProperties'];
 			$ActionQuery 		= $ActionQuery['ActionQuery'];
 			//Process the form, if data's been submitted
@@ -113,6 +118,7 @@ class Batarang {
 					$Fields = false;
 				} else {
 					$Type = 'edit';
+					//echo("BLINGATROO ".$_POST[$Action['FieldPrefix']."action"]); die;
 					$Fields = $UIFields;
 				}
 				$ActionQuery = $this->BatarangDB->BuildActionQuery($Action, $Type, $Fields);
@@ -148,6 +154,10 @@ class Batarang {
 					$Out .= "<tr class='BatarangRecord BatarangRecord$j'>\n";
 						$FirstColumn = false;
 						foreach ($Record as $Field => $Column) {
+							if ($Mask) {
+								if ($this->BatarangMasks->MaskField($Field, $Mask) === false || $this->BatarangMasks->MaskField($Field, $Mask) == KeyFlags::Hide) { continue; }
+							}
+							if ($Field === false || $Field == KeyFlags::Hide) { continue; }
 							$BuiltInActions_Interface = '';
 							
 							// We add the edit/delete builtins to the column
@@ -295,7 +305,8 @@ class Batarang {
 						// in the DB.
 						if ($UIFieldsProperties[$Field]['skip']) {$LabelStyle = 'disabled';} else {$LabelStyle = '';}
 						if (is_array($Mask)){
-							$Field = $Mask[$Field];
+							$Field = $this->BatarangMasks->MaskField($Field, $Mask);
+							if ($Field == KeyFlags::Hide) { continue; }
 						}
 						
 						$Out .= "<th class='{$LabelStyle}'>{$Field}</th>\n";
@@ -305,6 +316,7 @@ class Batarang {
 		$Out .="	<tr class='BatarangAction'>\n";
 					foreach ($UIFields as $Field) {
 						if ($UIFieldsProperties[$Field]['skip']) { $Out .= "<td class='disabled'></td>"; $k++; continue; }
+						if ($this->BatarangMasks->MaskField($Field, $Mask) == KeyFlags::Hide) { continue; }
 						if ($Task == 'Insert') {
 							// unless we're editing an existing field, load the default
 							// value into the table

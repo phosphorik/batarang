@@ -6,6 +6,44 @@ class BatarangDB {
     function __construct($ConfigReference, $Batarang){
         $this->BatarangConfig   = $ConfigReference;
         $this->Batarang         = $Batarang;
+        
+        if (!defined('__DELIM__')){
+		    switch ($this->BatarangConfig->DBDriver){
+				case 'MySQL':
+				case 'PostgreSQL':
+					define('__DELIM__', "'");
+					break;
+				case 'MSSQL':
+					define('__DELIM__', '');
+					break;
+			}
+		}
+        
+    }
+    
+    private function escape_key($data){
+    	switch ($this->BatarangConfig->DBDriver){
+    		case 'MSSQL':
+    			if ( !isset($data) or empty($data) ) return '';
+				if ( is_numeric($data) ) return $data;
+
+				$non_displayables = array(
+				    '/%0[0-8bcef]/',            // url encoded 00-08, 11, 12, 14, 15
+				    '/%1[0-9a-f]/',             // url encoded 16-31
+				    '/[\x00-\x08]/',            // 00-08
+				    '/\x0b/',                   // 11
+				    '/\x0c/',                   // 12
+				    '/[\x0e-\x1f]/'             // 14-31
+				);
+				foreach ( $non_displayables as $regex )
+				    $data = preg_replace( $regex, '', $data );
+				$data = str_replace("'", "''", $data );
+				return $data;
+				break;
+			default:
+				return $this->escape_string($data);
+				break;
+		}
     }
     
     public function escape_string($data){
@@ -14,8 +52,8 @@ class BatarangDB {
                 return pg_escape_string($data);
                 break;
             case 'MSSQL':
-                if(is_numeric($data))
-				return $data;
+                if (is_numeric(trim($data)))
+				return trim($data);
                 $unpacked = unpack('H*hex', $data);
                 return '0x' . $unpacked['hex'];
                 break;
@@ -69,14 +107,25 @@ class BatarangDB {
 	$Table = array_keys($ActionList['ByName']);
 	$Column = $ActionList['ByName'][$Table[0]];
 	$Query = "SELECT * FROM {$Column} WHERE ";
-	foreach (array_keys($ActionList['ByKey']) as $Key){
-		if ($i) {$Query .= " AND ";}
-		$s_Where = $this->escape_string($_POST[$Action['FieldPrefix'].'field_'.$i]);
-		$Query .= "{$Key} = '{$s_Where}'";
-		$i++;
-	}
-	$r = pg_query($Query); $r = pg_fetch_all($r);
 	
+	foreach (array_keys($ActionList['ByKey']) as $Key){
+		if (isset($ActionList['ByKey'][$Key]['edit']) && $ActionList['ByKey'][$Key]['edit'] == true){
+			if ($i) {$Query .= " AND ";}
+			$s_Where = $this->escape_string($_POST[$Action['FieldPrefix'].'field_'.$i]);
+			switch ($this->BatarangConfig->DBDriver){
+				case 'MySQL':
+				case 'PostgreSQL':
+					$s_Delim = "'";
+					break;
+				case 'MSSQL':
+					$s_Delim = '';
+					break;
+			}
+			$Query .= "{$Key} = ".__DELIM__."{$s_Where}".__DELIM__;
+			$i++;
+		}
+	}
+	$r = $this->ArrayQuery($Query);
 	return $r[0];
     }
     
@@ -114,8 +163,9 @@ class BatarangDB {
     }
     
     public function ActionQuery($ActionQuery){
-            echo($ActionQuery); //debug
+            //echo($ActionQuery); //die; //debug
             $this->Query($ActionQuery);
+           	//print_r(mssql_get_last_message()); die;
             // this is a very bad hack: in order to keep the batarang library completely modular
             // and autodetect the form/query details without prior config, we have to perform
             // the hook/query here... in the view. Which is evil, obviously. But the alternative
@@ -143,15 +193,25 @@ class BatarangDB {
                                 $ActionQuery = "INSERT INTO \n";
                                 $Keys = array_keys($FieldProps);
                                 $ActionQueryTables[] = $Column;
-                                
                                 foreach($Keys as $Field){
+                                		$UIFieldsProperties[$Field] = $this->Batarang->GetFieldProps($FieldProps[$Field]);
+                                		//echo("<br>".print_r($UIFieldsProperties[$Field],true).'</pre><br>');
+                                		$UIFields[] = $Field;
+                                		if ($UIFieldsProperties[$Field]['skip'] == '1' && !$UIFieldsProperties[$Field]['default']) { continue; }
+                                		
                                         $FieldsToInsert[] = $Field;
+                                        
+                                        if (isset($_REQUEST[$Action['FieldPrefix'].$Field])){
+                                        	$s_InsertHere = $this->escape_string($_REQUEST[$Action['FieldPrefix'].$Field]);
+                                        } else if (isset($UIFieldsProperties[$Field]['default'])) {
+                                        	$s_InsertHere = $this->escape_string($UIFieldsProperties[$Field]['default']);
+                                        } else {
+                                        	continue;
+                                        }
                                         
                                         // The following needs to be substantially rewritten
                                         // for interop with non-Postgres systems 
-                                        $DataToInsert[] = "'".@$this->escape_string($_REQUEST[$Action['FieldPrefix'].$Field])."'"; 
-                                        //echo($Action['FieldPrefix'].$Field.'<br><br>'); print_r($_REQUEST); die;
-                                        $UIFieldsProperties[$Field] = $this->Batarang->GetFieldProps($FieldProps[$Field]);
+                                        $DataToInsert[] = __DELIM__.$s_InsertHere.__DELIM__; 
                                         
                                         // Check to see if any built-in actions (like deleting/editing onscreen
                                         // records) are enabled on this Batarang form
@@ -172,7 +232,7 @@ class BatarangDB {
                                 
                                 
                                 //print_r($DataToInsert);die;
-                                $UIFields			= $FieldsToInsert;
+                                $DBFields			= $FieldsToInsert;
                                 $FieldsToInsert		= implode(', ', $FieldsToInsert);
                                 $DataToInsert		= implode(', ', $DataToInsert);
                                 $ActionQueryTables	= implode(', ', $ActionQueryTables);
@@ -182,12 +242,13 @@ class BatarangDB {
                         
                         $return = array(
                                 "UIFields"				=>	$UIFields,
+                                "DBFields"				=>	$UIFields,
                                 "UIFieldsProperties"	=>	$UIFieldsProperties,
                                 "ActionQuery"			=>	$ActionQuery
                         );
                         
                 } else if (strtolower($Type) == 'delete'){
-		    // This can cause problems if the Batarang instance involves a
+		  		  // This can cause problems if the Batarang instance involves a
                    // multi-table Delete that has identical field names which
                    // are identical to one used to build the Delete query.
                    //
@@ -207,11 +268,15 @@ class BatarangDB {
                                 if (sizeOf($ActionList['ByName']) > 0){
 					$i = 0;
                                         foreach (array_keys($ActionList['ByKey']) as $WhereField) {
-						if ($i) { $ActionQuery .= ' AND '; }
+                                        		if (!isset($ActionList['ByKey'][$WhereField]['delete'])){
+                                        			$i++;
+                                        			continue;
+                                        		}
+												if ($i) { $ActionQuery .= ' AND '; }
                                                 $WhereEquals = $this->escape_string($_POST[$Action['FieldPrefix']."field_".$i]);
-                                                $WhereField = $this->escape_string($WhereField);
-                                                $ActionQuery .= "{$WhereField}='{$WhereEquals}'";
-						$i++;
+                                                $WhereField = $this->escape_key($WhereField);
+                                                $ActionQuery .= "{$WhereField}=".__DELIM__."{$WhereEquals}".__DELIM__;
+												$i++;
                                         }
                                 }
                         }
@@ -227,9 +292,11 @@ class BatarangDB {
 		    $ActionQuery = "UPDATE $Column\n SET ";
 		    
 		    foreach ($Fields as $Field){
+		    $Properties = $this->Batarang->GetFieldProps($Action['Table'][$Column][$Field]);
+            if ($Properties['skip'] == '1') { continue; }
 			if (!isset($_REQUEST[$Action['FieldPrefix'].$Field])){continue;}
 			$s_Field = $this->escape_string($_REQUEST[$Action['FieldPrefix'].$Field]);
-			$Sets[] .= "$Field = '".$s_Field."'";
+			$Sets[] .= "$Field = ".__DELIM__.$s_Field.__DELIM__;
 		    }
 		    
 		    $ActionQuery .= implode(', ', $Sets) . ' WHERE ';
@@ -238,8 +305,8 @@ class BatarangDB {
 		    foreach (array_keys($ActionList['ByKey']) as $WhereField) {
 			    if ($i) { $ActionQuery .= ' AND '; }
 			    $WhereEquals = $this->escape_string($_REQUEST[$Action['FieldPrefix'].'current_'.$WhereField]);
-			    $WhereField = $this->escape_string($WhereField);
-			    $ActionQuery .= "{$WhereField}='{$WhereEquals}'";
+			    $WhereField = $this->escape_key($WhereField);
+			    $ActionQuery .= "{$WhereField}=".__DELIM__."{$WhereEquals}".__DELIM__;
 			    $i++;
 		    }
 		    
