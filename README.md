@@ -118,7 +118,7 @@ not your users.
 ###KeyHandling::Copy
 Any keys not present in both source data and mask are copied, using their original, ugly names.
 
-##K#eyHandling::Beautify
+###KeyHandling::Beautify
 Batarang will make its best attempt to present an attractive key name. Words are capitalized,
 underscores turned into spaces, etc cetera. This works best if the database primarily contains
 natural language key names.
