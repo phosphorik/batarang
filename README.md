@@ -110,15 +110,15 @@ The mask functions `ApplyToArray` and `MaskField` optionally accept a third para
 `$KeyHandling`, an enumerated type provided by Batarang. There are three legal options
 for this variable:
 
-##KeyHandling::Delete (Default)
+###KeyHandling::Delete (Default)
 If this is set, any keys that are present in the source dataset but not overridden in the mask
 are deleted. This is useful for screening out results that are useful to your middleware but
 not your users.
 
-##KeyHandling::Copy
+###KeyHandling::Copy
 Any keys not present in both source data and mask are copied, using their original, ugly names.
 
-##KeyHandling::Beautify
+##K#eyHandling::Beautify
 Batarang will make its best attempt to present an attractive key name. Words are capitalized,
 underscores turned into spaces, etc cetera. This works best if the database primarily contains
 natural language key names.
