@@ -266,18 +266,23 @@ class BatarangDB {
                                 $ActionQuery .= "DELETE from {$Table}
                                 WHERE\n";
                                 if (sizeOf($ActionList['ByName']) > 0){
-					$i = 0;
-                                        foreach (array_keys($ActionList['ByKey']) as $WhereField) {
-                                        		if (!isset($ActionList['ByKey'][$WhereField]['delete'])){
-                                        			$i++;
-                                        			continue;
-                                        		}
-												if ($i) { $ActionQuery .= ' AND '; }
-                                                $WhereEquals = $this->escape_string($_POST[$Action['FieldPrefix']."field_".$i]);
-                                                $WhereField = $this->escape_key($WhereField);
-                                                $ActionQuery .= "{$WhereField}=".__DELIM__."{$WhereEquals}".__DELIM__;
-												$i++;
-                                        }
+									$i = 0;
+									$c = 0;
+                                    foreach (array_keys($ActionList['ByKey']) as $WhereField) {
+                                    		if (!isset($ActionList['ByKey'][$WhereField]['delete'])){
+                                    			$i++;
+                                    			continue;
+                                    		}
+											if ($i) { $ActionQuery .= ' AND '; }
+                                            $WhereEquals = $this->escape_string($_POST[$Action['FieldPrefix']."field_".$i]);
+                                            $WhereField = $this->escape_key($WhereField);
+                                            $ActionQuery .= "{$WhereField}=".__DELIM__."{$WhereEquals}".__DELIM__;
+                                            $c++;
+											$i++;
+                                    }
+                                //if there are no excluding criteria, abort to avoid deleting all records
+                                if ($c === 0) { return false; }
+								                                    
                                 }
                         }
                 $return = array("ActionQuery"	=>	$ActionQuery);
@@ -302,13 +307,18 @@ class BatarangDB {
 		    $ActionQuery .= implode(', ', $Sets) . ' WHERE ';
 		    
 		    $i = 0;
+		    $c = 0;
 		    foreach (array_keys($ActionList['ByKey']) as $WhereField) {
 			    if ($i) { $ActionQuery .= ' AND '; }
 			    $WhereEquals = $this->escape_string($_REQUEST[$Action['FieldPrefix'].'current_'.$WhereField]);
 			    $WhereField = $this->escape_key($WhereField);
 			    $ActionQuery .= "{$WhereField}=".__DELIM__."{$WhereEquals}".__DELIM__;
+			    $c++;
 			    $i++;
 		    }
+		    
+		    // If there are no excluding criteria, abort to avoid editing every record
+		    if ($c === 0) { return false; }
 		    
 		    $ActionQuery .= ';';
 		    

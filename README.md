@@ -113,14 +113,14 @@ have some related perks. For one thing, BatarangDB has a set of DB-agnostic quer
 string escape methods, so if that's something you need just instance it outside of
 Batarang and go nuts. All the following methods support MySQL, PostgreSQL, and MS-SQL.
 
-##BatarangDB->escape_string($String)
+###BatarangDB->escape_string($String)
 Escapes a string. 
 
-##BatarangDB->ArrayQuery($String)
+###BatarangDB->ArrayQuery($String)
 Runs a query against the configured database and returns an associative array. Array format
 is consistent across RDBMS, so you shouldn't see broken indexes on MS-SQL queries.
 
-##BatarangDB->Query($String)
+###BatarangDB->Query($String)
 Runs a query against the configured database and returns a RDBMS-specific result object.
 
 
@@ -167,13 +167,14 @@ $Output = $this->batarang->FromArray($Data,	$Action);
    
 ##Field parameters
 A number of field-level parameters are supported. Multiple parameters per field
-are supported, separated by commas and optional whitespace.
+are supported, separated by commas and optional whitespace. The `edit` and `delete`
+parameters are useful for explaining to Batarang how to identify the deleted records.
 
 ###edit
-The field will be specified in the WHERE clause of any UPDATE queries.
+The field will be specified in the `WHERE` clause of any `UPDATE` queries.
 
 ###delete 
-The field will be specified in the WHERE clause of any DELETE queries.
+The field will be specified in the WHERE clause of any `DELETE` queries.
 
 ###skip
 The field will not be used when generating any queries. This is useful
@@ -208,5 +209,5 @@ There are a number of features we'd like which aren't done yet. That list includ
 * Database-backed Mask storage
 * Autodetect existing DB connection and switch DB functions to match rather than relying on BatarangConfig value
 * Pre-insert/pre-update function callbacks for field data
-* Pre-query data consistency & typing validation
+* Pre-query data consistency & type validation
 * Get some coffee that isn't stale
