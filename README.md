@@ -164,6 +164,14 @@ $Action = array(
 );
 $Output = $this->batarang->FromArray($Data,	$Action); 
 ```
+
+#Autogenerating Create, Update, and Delete pages
+To have Batarang generate your record insertion logic and UI, set the `Action` value
+of your configuration array to "SQLInsert".
+
+To automate your edit and delete functionality, simply specify "edit" and "delete" fields
+in your field parameters. Buttons will be automatically inserted into the table's first
+field.
    
 ##Field parameters
 A number of field-level parameters are supported. Multiple parameters per field
